@@ -1,0 +1,6 @@
+FROM golang:1.15-alpine
+WORKDIR $GOPATH/src/worker1
+COPY . .
+RUN go build -o worker1
+EXPOSE 9091
+CMD ["./pushgateway"]

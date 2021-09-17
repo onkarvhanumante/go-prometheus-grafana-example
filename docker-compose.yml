@@ -1,0 +1,32 @@
+version: '3'
+services:
+  webserver1:
+    build:
+      context: ./webserver1
+      dockerfile: dockerfile
+    ports:
+      - "127.0.0.1:8080:8080"
+  worker1:
+    build:
+      context: ./worker1
+      dockerfile: dockerfile
+    ports:
+      - "127.0.0.1:9091:9091"
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "127.0.0.1:9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "127.0.0.1:3000:3000"
+
