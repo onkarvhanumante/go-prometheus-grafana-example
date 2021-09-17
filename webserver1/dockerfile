@@ -1,0 +1,6 @@
+FROM golang:1.15-alpine
+WORKDIR $GOPATH/src/webserver1
+COPY . .
+RUN go build -o webserver1
+# EXPOSE 2112
+CMD ["./webserver1"]
