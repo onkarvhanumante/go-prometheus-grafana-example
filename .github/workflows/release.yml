@@ -47,13 +47,15 @@ jobs:
             releaseTag=$patchTag
           fi        
           echo "name=${releaseTag}" >> $GITHUB_OUTPUT
+         
+      - name: push tag
+        env:
+          tag: ${{ steps.releaseTag.outputs.name }}
+        run: |
+          git tag $tag
           
             
-      - uses: rickstaa/action-create-tag@v1
-        with:
-          tag: ${{ steps.releaseTag.outputs.name }}
-          message: "Latest release"       
-  
+      
   publish_draft:
       needs: update_release_draft
       permissions:
