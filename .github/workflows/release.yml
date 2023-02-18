@@ -56,7 +56,7 @@ jobs:
   publish draft:
       needs: update_release_draft
       permissions:
-      contents: write
+        contents: write
       runs-on: ubuntu-latest
       steps:
         - name: Checkout repo
