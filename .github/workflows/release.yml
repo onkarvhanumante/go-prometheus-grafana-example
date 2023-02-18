@@ -13,26 +13,10 @@ on:
         required: true
         description: 'patch: v0.0.X, minor: v0.X.0'
         
-permissions:
-  contents: read
-
 jobs:
   update_release_draft:
-    permissions:
-      # write permission is required to create a github release
-      contents: write
-      # write permission is required for autolabeler
-      # otherwise, read permission is required at least
-      # pull-requests: write
     runs-on: ubuntu-latest
-    steps:
-      # (Optional) GitHub Enterprise requires GHE_HOST variable set
-      #- name: Set GHE_HOST
-      #  run: |
-      #    echo "GHE_HOST=${GITHUB_SERVER_URL##https:\/\/}" >> $GITHUB_ENV
-
-      # Drafts your next Release notes as Pull Requests are merged into "master"
-      
+    steps:      
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
@@ -68,8 +52,18 @@ jobs:
       - uses: rickstaa/action-create-tag@v1
         with:
           tag: ${{ steps.releaseTag.outputs.name }}
-          message: "Latest release"
-          
-      - uses: release-drafter/release-drafter@v5.12.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: "Latest release"       
+  publish draft:
+      needs: update_release_draft
+      permissions:
+      contents: write
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repo
+          uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+
+        - uses: release-drafter/release-drafter@v5.12.1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
