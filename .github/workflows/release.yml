@@ -64,21 +64,12 @@ jobs:
           fi        
           echo "name=${releaseTag}" >> $GITHUB_OUTPUT
           
-      - name: Publish new tag
-        uses: actions/github-script@v6
-        env:
-          releaseTag: ${{ steps.releaseTag.outputs.name }}
-        with:
-          script: |
-            const { releaseTag } = process.env
-            const ref = "refs/tags/".concat('', releaseTag)
             
-            const result = await github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: ref,
-              sha: context.sha
-            })
+      - uses: rickstaa/action-create-tag@v1
+        with:
+          tag: ${{ steps.releaseTag.outputs.name }}
+          message: "Latest release"
+          
       - uses: release-drafter/release-drafter@v5.12.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
