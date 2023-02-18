@@ -53,7 +53,8 @@ jobs:
         with:
           tag: ${{ steps.releaseTag.outputs.name }}
           message: "Latest release"       
-  publish draft:
+  
+  publish_draft:
       needs: update_release_draft
       permissions:
         contents: write
