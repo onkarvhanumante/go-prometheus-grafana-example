@@ -32,6 +32,53 @@ jobs:
       #    echo "GHE_HOST=${GITHUB_SERVER_URL##https:\/\/}" >> $GITHUB_ENV
 
       # Drafts your next Release notes as Pull Requests are merged into "master"
+      
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      
+      - name: Determine current release tag
+        id: currentReleaseTag
+        run: |
+          tag=$(git describe --abbrev=0 --tags)
+          echo "name=${tag}" >> $GITHUB_OUTPUT
+          
+      - name: Compute all possible semvar tag versions
+        id: semvars
+        uses: "WyriHaximus/github-action-next-semvers@v1"
+        with:
+          version: ${{ steps.currentReleaseTag.outputs.name }}
+        
+      - name: Compute release tag
+        id: releaseTag
+        env:
+          minorTag: ${{ steps.semvars.outputs.v_minor }}
+          patchTag: ${{ steps.semvars.outputs.v_patch }}
+          releaseType: ${{ inputs.release }}
+        run: |
+          releaseTag=$minorTag
+          if [ $releaseType == 'patch' ]; then
+            releaseTag=$patchTag
+          fi        
+          echo "name=${releaseTag}" >> $GITHUB_OUTPUT
+          
+      - name: Publish new tag
+        uses: actions/github-script@v6
+        env:
+          releaseTag: ${{ steps.releaseTag.outputs.name }}
+        with:
+          script: |
+            const { releaseTag } = process.env
+            const ref = "refs/tags/".concat('', releaseTag)
+            
+            const result = await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: ref,
+              sha: context.sha
+            })
       - uses: release-drafter/release-drafter@v5.12.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
