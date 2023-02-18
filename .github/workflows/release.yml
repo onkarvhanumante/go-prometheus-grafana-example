@@ -13,52 +13,8 @@ on:
         required: true
         description: 'patch: v0.0.X, minor: v0.X.0'
         
-jobs:
-  update_release_draft:
-    runs-on: ubuntu-latest
-    steps:      
-      - name: Checkout repo
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      
-      
-      - name: Determine current release tag
-        id: currentReleaseTag
-        run: |
-          tag=$(git describe --abbrev=0 --tags)
-          echo "name=${tag}" >> $GITHUB_OUTPUT
-          
-      - name: Compute all possible semvar tag versions
-        id: semvars
-        uses: "WyriHaximus/github-action-next-semvers@v1"
-        with:
-          version: ${{ steps.currentReleaseTag.outputs.name }}
-        
-      - name: Compute release tag
-        id: releaseTag
-        env:
-          minorTag: ${{ steps.semvars.outputs.v_minor }}
-          patchTag: ${{ steps.semvars.outputs.v_patch }}
-          releaseType: ${{ inputs.release }}
-        run: |
-          releaseTag=$minorTag
-          if [ $releaseType == 'patch' ]; then
-            releaseTag=$patchTag
-          fi        
-          echo "name=${releaseTag}" >> $GITHUB_OUTPUT
-         
-      - name: push tag
-        env:
-          tag: ${{ steps.releaseTag.outputs.name }}
-        run: |
-          git tag $tag
-          git push origin $tag
-          
-            
-      
+jobs:      
   publish_draft:
-      needs: update_release_draft
       permissions:
         contents: write
       runs-on: ubuntu-latest
