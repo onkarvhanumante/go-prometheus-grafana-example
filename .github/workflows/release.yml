@@ -33,6 +33,9 @@ jobs:
         # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
         with:
           publish: true
+          name: v2.4.0
+          tag: v2.4.0
+          version: v2.4.0
         #   config-name: my-config.yml
         #   disable-autolabeler: true
         env:
